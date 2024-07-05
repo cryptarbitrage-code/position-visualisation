@@ -10,7 +10,7 @@ pd.set_option('display.max_columns', None)  # useful for testing
 instrument = "BTC-PERPETUAL"
 resolution = 720  # resolution in minutes
 end_time = datetime.now()
-start_time = end_time - timedelta(minutes=20 * resolution)
+start_time = end_time - timedelta(minutes=60 * resolution)
 
 # Convert start_timestamp and end_timestamp to unix time in milliseconds
 start_timestamp = int(start_time.timestamp() * 1000)
@@ -18,7 +18,6 @@ end_timestamp = int(end_time.timestamp() * 1000)
 
 candle_data = get_tradingview_chart_data(instrument, start_timestamp, end_timestamp, resolution)
 df_candle = pd.DataFrame(candle_data)
-print(df_candle)
 df_candle = df_candle[['ticks', 'open', 'high', 'low', 'close']]
 df_candle['date'] = pd.to_datetime(df_candle['ticks'], unit='ms')
 
@@ -34,8 +33,9 @@ positions = positions[columns_to_keep]
 option_positions = positions[positions['kind'] == "option"].copy()
 option_positions[['currency', 'expiry', 'strike', 'type']] = option_positions['instrument_name'].str.split('-', expand=True)
 option_positions = option_positions[option_positions['currency'] == "BTC"]
-
-### need to create column for expiry_date
+option_positions['strike'] = option_positions['strike'].astype(float)
+option_positions['expiry_date'] = pd.to_datetime(option_positions['expiry'], format='%d%b%y')
+option_positions['expiry_date'] = option_positions['expiry_date'] + pd.Timedelta(hours=8)
 
 print(option_positions)
 
@@ -60,7 +60,7 @@ for index, pos in option_positions.iterrows():
         marker=dict(
             symbol=symbol,
             color=arrow_color,
-            size=12
+            size=8
         ),
         # text=pos['type'].capitalize(),
         # textposition="top center"
