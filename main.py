@@ -1,5 +1,6 @@
 import plotly.graph_objs as go
 from dash import Dash, dcc, html
+import dash_bootstrap_components as dbc
 import pandas as pd
 from api_functions import get_tradingview_chart_data, get_positions
 from datetime import datetime, timedelta
@@ -36,17 +37,22 @@ option_positions = option_positions[option_positions['currency'] == "BTC"]
 option_positions['strike'] = option_positions['strike'].astype(float)
 option_positions['expiry_date'] = pd.to_datetime(option_positions['expiry'], format='%d%b%y')
 option_positions['expiry_date'] = option_positions['expiry_date'] + pd.Timedelta(hours=8)
+option_positions = option_positions.sort_values(by='expiry_date')
 
 print(option_positions)
 
-app = Dash(__name__)
+app = Dash(title="Volatility Dashboard", external_stylesheets=[dbc.themes.DARKLY])
 
 # Create the candlestick chart
-fig = go.Figure(data=[go.Candlestick(x=df_candle['date'],
-                                     open=df_candle['open'],
-                                     high=df_candle['high'],
-                                     low=df_candle['low'],
-                                     close=df_candle['close'])])
+fig = go.Figure(
+    data=[go.Candlestick(
+        x=df_candle['date'],
+        open=df_candle['open'],
+        high=df_candle['high'],
+        low=df_candle['low'],
+        close=df_candle['close']
+    )],
+)
 
 # Add arrows for each position
 for index, pos in option_positions.iterrows():
@@ -63,14 +69,17 @@ for index, pos in option_positions.iterrows():
             size=8
         ),
         # text=pos['type'].capitalize(),
-        # textposition="top center"
+        # textposition="top center",
+        name=pos['instrument_name'],
     ))
 
 # Adjust layout settings
 fig.update_layout(
+    template='plotly_dark',
     title='Candlestick Chart with Option Positions',
     xaxis_title='Date',
-    yaxis_title='Price'
+    yaxis_title='Price',
+    xaxis_rangeslider_visible=False,
 )
 
 app.layout = html.Div(children=[
