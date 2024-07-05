@@ -9,7 +9,7 @@ pd.set_option('display.max_columns', None)  # useful for testing
 
 # --- GET CANDLE DATA --- #
 instrument = "BTC-PERPETUAL"
-resolution = 720  # resolution in minutes
+resolution = 1440  # resolution in minutes
 end_time = datetime.now()
 start_time = end_time - timedelta(minutes=60 * resolution)
 
@@ -41,7 +41,7 @@ option_positions = option_positions.sort_values(by='expiry_date')
 
 print(option_positions)
 
-app = Dash(title="Volatility Dashboard", external_stylesheets=[dbc.themes.DARKLY])
+app = Dash(title="Position Visualisation", external_stylesheets=[dbc.themes.DARKLY])
 
 # Create the candlestick chart
 fig = go.Figure(
@@ -50,7 +50,8 @@ fig = go.Figure(
         open=df_candle['open'],
         high=df_candle['high'],
         low=df_candle['low'],
-        close=df_candle['close']
+        close=df_candle['close'],
+        name=instrument,
     )],
 )
 
