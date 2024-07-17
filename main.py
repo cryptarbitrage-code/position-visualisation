@@ -63,14 +63,15 @@ for index, pos in option_positions.iterrows():
     fig.add_trace(go.Scatter(
         x=[pos['expiry_date']],
         y=[pos['strike']],
-        mode='markers',  # markers+text to include text
+        mode='markers+text',  # markers+text to include text
         marker=dict(
             symbol=symbol,
             color=arrow_color,
             size=8
         ),
-        # text=pos['type'].capitalize(),
-        # textposition="top center",
+        text=pos['size'],
+        textposition="top center",
+        textfont=dict(size=8),
         name=pos['instrument_name'],
     ))
 
@@ -81,6 +82,7 @@ fig.update_layout(
     xaxis_title='Date',
     yaxis_title='Price',
     xaxis_rangeslider_visible=False,
+    height=800
 )
 
 app.layout = html.Div(children=[
