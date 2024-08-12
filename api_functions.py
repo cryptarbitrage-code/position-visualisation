@@ -4,6 +4,7 @@ import json
 import time
 import pandas as pd
 import requests
+# settings_backup used to avoid accidental upload of real api keys, instead use: settings
 from settings_backup import *
 
 
